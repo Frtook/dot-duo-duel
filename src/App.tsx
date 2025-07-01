@@ -1,35 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+"use client";
+import { DndContext, type DragEndEvent } from "@dnd-kit/core";
+import { useState } from "react";
+import Drag from "./drag";
+import { Drop } from "./drop";
 
-function App() {
-  const [count, setCount] = useState(0)
+const initialRows = [
+  { id: "row-1", hasDot: false },
+  { id: "row-2", hasDot: false },
+  { id: "row-3", hasDot: false },
+];
+export default function App() {
+  const [row, setRow] = useState(initialRows);
+
+  const handleDragEnd = ({ over }: DragEndEvent) => {
+    setRow((prevRows) =>
+      prevRows.map((row) => ({
+        ...row,
+        hasDot: over?.id === row.id,
+      }))
+    );
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <DndContext onDragEnd={handleDragEnd}>
+      <div className="p-4 mx-auto mt-20 border rounded flex gap-4">
+        {row.every((item) => !item.hasDot) && <Drag />}
+        {row.map((item) => (
+          <Drop id={item.id}>{item.hasDot && <Drag />}</Drop>
+        ))}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </DndContext>
+  );
 }
-
-export default App
