@@ -1,9 +1,9 @@
 "use client";
 import { useDraggable } from "@dnd-kit/core";
 
-export default function Drag() {
+export default function Drag({ id }: { id: string }) {
   const { setNodeRef, attributes, listeners, transform } = useDraggable({
-    id: "draggable-1", // use a string
+    id,
   });
 
   const style = {
@@ -20,7 +20,7 @@ export default function Drag() {
       style={style}
       className="p-2 cursor-pointer border"
     >
-      my button
+      {id}
     </button>
   );
 }
