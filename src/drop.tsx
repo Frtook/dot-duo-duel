@@ -15,7 +15,7 @@ export function Drop({ id, children }: Props) {
   return (
     <div
       ref={setNodeRef}
-      className={`border w-[100px] h-[100px] flex items-center justify-center ${
+      className={`border w-full   h-[100px] flex items-center justify-center ${
         isOver ? "bg-green-100" : ""
       }`}
     >

@@ -17,12 +17,12 @@ const initialRows = [
 ];
 
 const initPlayers = [
-  { id: "p-1", place: "stage-1" },
-  { id: "p-2", place: "stage-1" },
-  { id: "p-3", place: "stage-1" },
-  { id: "p-4", place: "stage-2" },
-  { id: "p-5", place: "stage-2" },
-  { id: "p-6", place: "stage-2" },
+  { id: "p-1", color: "green", place: "stage-1" },
+  { id: "p-2", color: "green", place: "stage-1" },
+  { id: "p-3", color: "green", place: "stage-1" },
+  { id: "p-4", color: "skyblue", place: "stage-2" },
+  { id: "p-5", color: "skyblue", place: "stage-2" },
+  { id: "p-6", color: "skyblue", place: "stage-2" },
 ];
 export default function App() {
   const [row, setRow] = useState(initialRows);
@@ -33,48 +33,57 @@ export default function App() {
   useEffect(() => {
     console.log(row);
   }, [row]);
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     const playerId = active.id as string;
     const rowId = over?.id as string | null;
+
     if (!rowId) return;
-    setRow((prevRows) =>
-      prevRows.map((row) =>
-        row.id === rowId ? { ...row, player: playerId } : row
-      )
+    if (players.find((player) => player.place === rowId)) return; // if the player have the same row
+    setRow(
+      (prevRows) =>
+        prevRows
+          .map(
+            (row) => (row.player === playerId ? { ...row, player: "" } : row) // remove the player from all row
+          )
+          .map((row) => (row.id === rowId ? { ...row, player: playerId } : row)) // update the player to the row
     );
     setPlayers((prevPlayer) =>
-      prevPlayer.map((player) =>
-        player.id === playerId ? { ...player, place: rowId } : player
+      prevPlayer.map(
+        (player) =>
+          player.id === playerId ? { ...player, place: rowId } : player // update the place of player
       )
     );
   };
   return (
     <DndContext onDragEnd={handleDragEnd}>
       {/* stage 1*/}
-      <Drop id="stage-1">
-        {players
-          .filter((player) => player.place === "stage-1")
-          .map((player) => (
-            <Drag id={player.id} key={player.id} />
-          ))}
-      </Drop>
-      {/* stage 2 */}
-      <Drop id="stage-2">
-        {players
-          .filter((player) => player.place === "stage-2")
-          .map((player) => (
-            <Drag id={player.id} key={player.id} />
-          ))}
-      </Drop>
+      <div className="flex gap-10 justify-between p-4">
+        <Drop id="stage-1">
+          {players
+            .filter((player) => player.place === "stage-1")
+            .map((player) => (
+              <Drag color={player.color} id={player.id} key={player.id} />
+            ))}
+        </Drop>
+        {/* stage 2 */}
+        <Drop id="stage-2">
+          {players
+            .filter((player) => player.place === "stage-2")
+            .map((player) => (
+              <Drag color={player.color} id={player.id} key={player.id} />
+            ))}
+        </Drop>
+      </div>
 
-      <div className="p-4 items-center grid grid-cols-3 mx-auto mt-20 border rounded gap-4">
+      <div className="p-4 max-w-sm gap-10 grid grid-cols-3 mx-auto mt-20 border rounded">
         {row.map((item) => (
           <Drop key={item.id} id={item.id}>
             {players
               .filter((player) => player.id === item.player)
               .map((player) => (
-                <Drag id={player.id} key={player.id} />
+                <Drag id={player.id} color={player.color} key={player.id} />
               ))}
           </Drop>
         ))}

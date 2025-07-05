@@ -1,15 +1,16 @@
 "use client";
 import { useDraggable } from "@dnd-kit/core";
 
-export default function Drag({ id }: { id: string }) {
+export default function Drag({ id, color }: { id: string; color?: string }) {
   const { setNodeRef, attributes, listeners, transform } = useDraggable({
     id,
   });
 
-  const style = {
+  const style: React.CSSProperties = {
     transform: transform
       ? `translate(${transform.x}px, ${transform.y}px)`
       : undefined,
+    backgroundColor: color,
   };
 
   return (
@@ -17,10 +18,8 @@ export default function Drag({ id }: { id: string }) {
       ref={setNodeRef}
       {...attributes}
       {...listeners}
+      className="p-6 rounded-full cursor-pointer  "
       style={style}
-      className="p-2 cursor-pointer border"
-    >
-      {id}
-    </button>
+    ></button>
   );
 }
