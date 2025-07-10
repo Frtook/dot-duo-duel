@@ -1,23 +1,27 @@
 "use client";
 import { useDroppable } from "@dnd-kit/core";
 import React from "react";
+import { cn } from "./lib/utils";
 
 type Props = {
   id: string;
   children?: React.ReactNode;
+  className?: string;
 };
 
-export function Drop({ id, children }: Props) {
+export function Drop({ id, children, className }: Props) {
   const { setNodeRef, isOver } = useDroppable({
     id,
   });
-
   return (
     <div
       ref={setNodeRef}
-      className={`border w-full   h-[100px] flex items-center justify-center ${
-        isOver ? "bg-green-100" : ""
-      }`}
+      className={cn(
+        `border w-full h-[100px] flex items-center justify-center ${className}`,
+        {
+          "bg-gray-300": isOver,
+        }
+      )}
     >
       {children}
     </div>

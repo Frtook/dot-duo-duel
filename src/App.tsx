@@ -1,6 +1,6 @@
 "use client";
 import { DndContext, type DragEndEvent } from "@dnd-kit/core";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Drag from "./drag";
 import { Drop } from "./drop";
 
@@ -17,30 +17,35 @@ const initialRows = [
 ];
 
 const initPlayers = [
-  { id: "p-1", color: "green", place: "stage-1" },
-  { id: "p-2", color: "green", place: "stage-1" },
-  { id: "p-3", color: "green", place: "stage-1" },
-  { id: "p-4", color: "skyblue", place: "stage-2" },
-  { id: "p-5", color: "skyblue", place: "stage-2" },
-  { id: "p-6", color: "skyblue", place: "stage-2" },
+  { name: "player-1", id: "p-1", color: "green", place: "stage-1" },
+  { name: "player-1", id: "p-2", color: "green", place: "stage-1" },
+  { name: "player-1", id: "p-3", color: "green", place: "stage-1" },
+  { name: "player-2", id: "p-4", color: "skyblue", place: "stage-2" },
+  { name: "player-2", id: "p-5", color: "skyblue", place: "stage-2" },
+  { name: "player-2", id: "p-6", color: "skyblue", place: "stage-2" },
 ];
 export default function App() {
   const [row, setRow] = useState(initialRows);
   const [players, setPlayers] = useState(initPlayers);
-  useEffect(() => {
-    console.log(players);
-  }, [players]);
-  useEffect(() => {
-    console.log(row);
-  }, [row]);
+  const [whoPlayed, setWhoPlayed] = useState("");
+
+  // useEffect(() => {
+  //   console.log(players);
+  // }, [players]);
+  // useEffect(() => {
+  //   console.log(row);
+  // }, [row]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     const playerId = active.id as string;
     const rowId = over?.id as string | null;
+    const playerName = active.data.current?.name || "";
 
     if (!rowId) return;
+    if (whoPlayed === playerName) return; // check the player cannot play more than one
     if (players.find((player) => player.place === rowId)) return; // if the player have the same row
+
     setRow(
       (prevRows) =>
         prevRows
@@ -49,41 +54,63 @@ export default function App() {
           )
           .map((row) => (row.id === rowId ? { ...row, player: playerId } : row)) // update the player to the row
     );
+
     setPlayers((prevPlayer) =>
       prevPlayer.map(
         (player) =>
           player.id === playerId ? { ...player, place: rowId } : player // update the place of player
       )
     );
+
+    setWhoPlayed(playerName);
   };
   return (
     <DndContext onDragEnd={handleDragEnd}>
       {/* stage 1*/}
       <div className="flex gap-10 justify-between p-4">
-        <Drop id="stage-1">
+        <Drop id="stage-1" className="justify-around">
           {players
             .filter((player) => player.place === "stage-1")
             .map((player) => (
-              <Drag color={player.color} id={player.id} key={player.id} />
+              <Drag
+                data={{ ...player }}
+                color={player.color}
+                id={player.id}
+                key={player.id}
+              />
             ))}
         </Drop>
         {/* stage 2 */}
-        <Drop id="stage-2">
+        <Drop id="stage-2" className="justify-around">
           {players
             .filter((player) => player.place === "stage-2")
             .map((player) => (
-              <Drag color={player.color} id={player.id} key={player.id} />
+              <Drag
+                data={{ ...player }}
+                color={player.color}
+                id={player.id}
+                key={player.id}
+              />
             ))}
         </Drop>
       </div>
-
+      {/* Board */}
       <div className="p-4 max-w-sm gap-10 grid grid-cols-3 mx-auto mt-20 border rounded">
         {row.map((item) => (
-          <Drop key={item.id} id={item.id}>
+          <Drop
+            className="rounded-full bg-gray-200 border-none size-16"
+            key={item.id}
+            id={item.id}
+          >
             {players
               .filter((player) => player.id === item.player)
               .map((player) => (
-                <Drag id={player.id} color={player.color} key={player.id} />
+                <Drag
+                  data={{ ...player }}
+                  id={player.id}
+                  color={player.color}
+                  key={player.id}
+                />
               ))}
           </Drop>
         ))}
